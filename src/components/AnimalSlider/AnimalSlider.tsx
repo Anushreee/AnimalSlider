@@ -7,18 +7,27 @@ const Wrapper = styled.div`
  margin: 0 auto;
  max-width: 800px;
  overflow: hidden;
+ position: relative;
+ height: 300px;
 `
 
 const Article = styled.article`
-  display: grid;
-  grid-template-rows: min-content 200px min-content;
+  display: flex;
+  flex-direction: column;
+  //grid-template-rows: min-content 200px min-content;
+  opacity: 0;
+  position: absolute;
+  left:0;
+
+  top:0;
+  
   
   &.activeSlide {
     opacity: 1;
     transform: translateX(0);
   }
 
-  &.lastSlide {
+  &.previousSlide {
     transform: translateX(-100%);
   }
 
@@ -85,26 +94,29 @@ interface Animal {
 }
 
 interface AnimalSliderProps {
-  data: Animal[];
+  animals: Animal[];
 }
 
-const AnimalSlider: React.FC<AnimalSliderProps> = ({ data }) => {
-  const [animals, setAnimals] = useState(data);
-  const [index, setIndex] = useState(0);
+const AnimalSlider: React.FC<AnimalSliderProps> = ({ animals }) => {
+  const [currentAnimalIndex, setCurrentAnimalIndex] = useState(0);
 
   return (
     <div className="App">
       <h1>Wild Animals</h1>
       <Wrapper>
         {
-          animals.map(({ name, img, habitat }, animalIndex) => {
-            let position = "nextSlide";
-            if (animalIndex === index) {
+          animals.map(({ name, img, habitat }, index) => {
+            let position = "";
+            if (index === currentAnimalIndex) {
               position = "activeSlide";
             }
 
-            if (animalIndex === index - 1 || index === 0) {
-              position = "lastSlide";
+            if (index === currentAnimalIndex - 1 ) {
+              position = "previousSlide";
+            }
+
+            if (index === currentAnimalIndex + 1) {
+              position = "nextSlide";
             }
             return <Article className={position}>
               <Heading>{name}</Heading>
@@ -112,8 +124,8 @@ const AnimalSlider: React.FC<AnimalSliderProps> = ({ data }) => {
                 <AnimalImageWrapper>
                   <AnimalImage src={img} alt={name} />
                 </AnimalImageWrapper>
-                <ArrowLeft onClick={() => setIndex(index - 1)} />
-                <ArrowRight onClick={() => setIndex(index + 1)} />
+                <ArrowLeft onClick={() => setCurrentAnimalIndex(index - 1)} />
+                <ArrowRight onClick={() => setCurrentAnimalIndex(index + 1)} />
               </Slider>
               <Description>{habitat}</Description>
             </Article>
