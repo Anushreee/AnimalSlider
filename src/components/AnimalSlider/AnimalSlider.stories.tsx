@@ -29,5 +29,5 @@ storiesOf('Slider', module).add('default', () => {
       habitat: 'forest'
     }
   ]
-  return <AnimalSlider data={data} />
+  return <AnimalSlider animals={data} />
 });

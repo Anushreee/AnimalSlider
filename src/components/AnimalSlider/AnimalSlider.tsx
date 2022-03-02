@@ -1,80 +1,62 @@
 import React, { useState } from 'react';
-import { FaChevronRight, FaChevronLeft } from 'react-icons/fa';
+import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from 'react-icons/fa';
 import styled from 'styled-components';
 
-const Wrapper = styled.div` 
- display: flex;
- margin: 0 auto;
- max-width: 800px;
- overflow: hidden;
+const Slider = styled.div`
+  position: relative;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ArrowLeft = styled(FaArrowAltCircleLeft)`
+  position: absolute;
+  top: 50%;
+  left: 32px;
+  font-size: 3rem;
+  color: #000;
+  z-index: 10;
+  cursor: pointer;
+`;
+
+const ArrowRight = styled(FaArrowAltCircleRight)`
+  position: absolute;
+  top: 50%;
+  right: 32px;
+  font-size: 3rem;
+  color: #000;
+  z-index: 10;
+  cursor: pointer;
+ 
+`;
+
+const AnimalImage = styled.img`
+  width: 1000px;
+  height: 600px;
+  border-radius: 6px;
+  object-fit: cover;
 `
 
-const Article = styled.article`
-  display: grid;
-  grid-template-rows: min-content 200px min-content;
-  
-  &.activeSlide {
+const Slide = styled.div`
+  opacity: 0;
+  transition-duration: 1s ease;
+
+  &.active {
     opacity: 1;
-    transform: translateX(0);
-  }
-
-  &.lastSlide {
-    transform: translateX(-100%);
-  }
-
-  &.nextSlide {
-    transform: translateX(100%);
+    transition-duration: 1s;
+    transform: scale(1.08);
   }
 `
 
 const Heading = styled.h1`
-grid-column: 1/-1;
-`
-
-const Slider = styled.div`
-  display: grid;
-  grid-template-columns: 300px;
-  grid-template-rows: 200px;
+  font-size: 2rem;
+  display: block;
 `
 
 const Description = styled.div`
-grid-column: 1/-1;
-`;
-
-const AnimalImageWrapper = styled.div`
-  grid-column: 1/-1;
-  grid-row: 1/2;
-  z-index: 1;
- 
-`
-
-const AnimalImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  
-`
-
-const ArrowRight = styled(FaChevronRight)`
-  height: 2rem;
-  width: 2rem;
-  grid-column: 1/-1;
-  grid-row: 1/2;
-  z-index: 2;
-  justify-self: end;
-  align-self: center;
-  margin-right: 20px;
-`
-
-const ArrowLeft = styled(FaChevronLeft)`
-  height: 2rem;
-  width: 2rem;
-  grid-column: 1/-1;
-  grid-row: 1/2;
-  z-index: 2;
-  justify-self: start;
-  align-self: center;
-  margin-left: 20px;
+font-size: 2rem;
+display: block;
 `
 
 interface Animal {
@@ -85,43 +67,49 @@ interface Animal {
 }
 
 interface AnimalSliderProps {
-  data: Animal[];
+  animals: Animal[];
 }
 
-const AnimalSlider: React.FC<AnimalSliderProps> = ({ data }) => {
-  const [animals, setAnimals] = useState(data);
-  const [index, setIndex] = useState(0);
+const AnimalSlider: React.FC<AnimalSliderProps> = ({ animals }) => {
+  const [current, setCurrent] = useState(0);
+  const length = animals.length;
+
+  const nextSlide = () => {
+    setCurrent(current === length - 1 ? 0 : current + 1)
+  }
+
+  const previousSlide = () => {
+    setCurrent(current === 0 ? length - 1 : current - 1)
+  }
+
+  console.log('current is', current)
+
+  if (animals.length <= 0) {
+    return null;
+  }
 
   return (
-    <div className="App">
-      <h1>Wild Animals</h1>
-      <Wrapper>
-        {
-          animals.map(({ name, img, habitat }, animalIndex) => {
-            let position = "nextSlide";
-            if (animalIndex === index) {
-              position = "activeSlide";
+    <Slider>
+      <ArrowLeft onClick={previousSlide} />
+      <ArrowRight onClick={nextSlide} />
+      {animals.map((animal, index) => {
+        return (
+          <Slide className={index === current ? 'active' : ''}>
+            {index === current &&
+              <>
+                <Heading> {animal.name}</Heading>
+                <AnimalImage src={animal.img} alt={animal.name} />
+                <Description>{animal.habitat}</Description>
+              </>
+
             }
 
-            if (animalIndex === index - 1 || index === 0) {
-              position = "lastSlide";
-            }
-            return <Article className={position}>
-              <Heading>{name}</Heading>
-              <Slider>
-                <AnimalImageWrapper>
-                  <AnimalImage src={img} alt={name} />
-                </AnimalImageWrapper>
-                <ArrowLeft onClick={() => setIndex(index - 1)} />
-                <ArrowRight onClick={() => setIndex(index + 1)} />
-              </Slider>
-              <Description>{habitat}</Description>
-            </Article>
-          })
-        }
-      </Wrapper>
-    </div>
-  );
+          </Slide>
+        )
+      })}
+    </Slider>
+
+  )
 }
 
 export default AnimalSlider;
