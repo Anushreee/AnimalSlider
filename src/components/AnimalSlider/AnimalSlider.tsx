@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from 'react-icons/fa';
 import styled from 'styled-components';
 
+
 const Slider = styled.div`
   position: relative;
   height: 100vh;
